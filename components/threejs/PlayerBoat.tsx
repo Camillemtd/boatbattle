@@ -1,10 +1,16 @@
-import { useRef, forwardRef, useEffect } from 'react'
+import { useRef, forwardRef, useEffect, ForwardedRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useKeyboard } from './useKeyboard'
+import { Mesh, BufferGeometry, Material, Object3DEventMap } from 'three'
 
-const PlayerBoat = forwardRef((props, ref) => {
-  const localRef = useRef()
+type MeshType = Mesh<BufferGeometry, Material | Material[]>
+
+const PlayerBoat = forwardRef((
+  props: any, 
+  ref: ForwardedRef<MeshType>
+) => {
+  const localRef = useRef<MeshType>(null)
   const velocityRef = useRef(new THREE.Vector3())
   const rotationVelocityRef = useRef(0)
   
@@ -65,7 +71,11 @@ const PlayerBoat = forwardRef((props, ref) => {
   // Synchroniser la ref locale avec la ref transmise
   useEffect(() => {
     if (ref) {
-      ref.current = localRef.current
+      if (typeof ref === 'function') {
+        ref(localRef.current)
+      } else {
+        ref.current = localRef.current
+      }
     }
   }, [ref])
 

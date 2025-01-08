@@ -12,7 +12,7 @@ const Canvas = dynamic(() => import('@react-three/fiber').then(mod => mod.Canvas
 })
 
 // Composant pour gérer la caméra qui suit
-function CameraController({ target }) {
+function CameraController({ target } : any ) {
   const { camera } = useThree()
   const cameraRef = useRef({
     position: new THREE.Vector3(),
@@ -27,8 +27,8 @@ function CameraController({ target }) {
     target.current.getWorldPosition(targetPosition)
     
     const boatRotation = target.current.rotation.y
-    const distance = 8 // Distance derrière le bateau
-    const height = 12  // Hauteur au-dessus du bateau
+    const distance = 15 // Distance derrière le bateau
+    const height = 15  // Hauteur au-dessus du bateau
     
     // Calculer la position de la caméra par rapport au bateau
     const cameraTargetX = targetPosition.x - Math.sin(boatRotation) * distance
@@ -52,7 +52,7 @@ function CameraController({ target }) {
 }
 
 export default function Game() {
-  const playerRef = useRef()
+  const playerRef = useRef<THREE.Mesh>(null)
 
   return (
     <div style={{ width: '100%', height: '100vh' }}>
@@ -65,7 +65,7 @@ export default function Game() {
         
         <Ocean />
         <PlayerBoat ref={playerRef} position={[0, -1, 0]} />
-        {/* <CameraController target={playerRef} /> */}
+        <CameraController target={playerRef} />
       </Canvas>
     </div>
   )
