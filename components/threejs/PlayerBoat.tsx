@@ -2,7 +2,7 @@ import { useRef, forwardRef, useEffect, ForwardedRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF, Clone } from '@react-three/drei'
 import * as THREE from 'three'
-import { useKeyboard } from './useKeyboard'
+import { useKeyboard } from '../../hooks/useKeyboard'
 import { Mesh, BufferGeometry, Material, Object3DEventMap } from 'three'
 
 type MeshType = Mesh<BufferGeometry, Material | Material[]>

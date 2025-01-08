@@ -10,4 +10,4 @@ export default function Island() {
     
 }
 
-useGLTF.preload('./island.glb')
+useGLTF.preload('./model/island.glb')
