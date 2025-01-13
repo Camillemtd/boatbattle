@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useGLTF, Clone } from '@react-three/drei'
 import * as THREE from 'three'
 import { useKeyboard } from '../../hooks/useKeyboard'
-import { Mesh, BufferGeometry, Material, Object3DEventMap } from 'three'
+import { Mesh, BufferGeometry, Material, } from 'three'
 
 type MeshType = Mesh<BufferGeometry, Material | Material[]>
 
@@ -98,6 +98,7 @@ const PlayerBoat = forwardRef((
       <Clone 
         object={scene}
         scale={[0.5, 0.5, 0.5]}
+        position={[0,0,0]}
       />
     </group>
   )

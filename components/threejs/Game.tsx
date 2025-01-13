@@ -1,71 +1,86 @@
-'use client'
-import { OrbitControls } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
-import dynamic from 'next/dynamic'
-import { useEffect, useRef } from 'react'
-import * as THREE from 'three'
-import Ocean from '@/components/threejs/Ocean'
-import PlayerBoat from '@/components/threejs/PlayerBoat'
+"use client"
+import { OrbitControls } from "@react-three/drei"
+import { useFrame, useThree } from "@react-three/fiber"
+import dynamic from "next/dynamic"
+import { useEffect, useRef } from "react"
+import * as THREE from "three"
+import Ocean from "@/components/threejs/Ocean"
+import PlayerBoat from "@/components/threejs/PlayerBoat"
+import Island from "./Island"
+import { RigidBody, Physics } from "@react-three/rapier"
 
-const Canvas = dynamic(() => import('@react-three/fiber').then(mod => mod.Canvas), {
-  ssr: false
-})
+const Canvas = dynamic(
+  () => import("@react-three/fiber").then((mod) => mod.Canvas),
+  {
+    ssr: false,
+  }
+)
 
 // Composant pour gérer la caméra qui suit
-function CameraController({ target } : any ) {
-	const { camera } = useThree()
-	const cameraRef = useRef({
-	  position: new THREE.Vector3(),
-	  lookAt: new THREE.Vector3()
-	})
-  
-	useFrame(() => {
-	  if (!target.current) return
-  
-	  // Position cible de la caméra (toujours derrière le bateau)
-	  const targetPosition = new THREE.Vector3()
-	  target.current.getWorldPosition(targetPosition)
-	  
-	  // Distance fixe derrière le bateau, sans tenir compte de sa rotation
-	  const distance = 15 // Distance derrière le bateau
-	  const height = 15  // Hauteur au-dessus du bateau
-	  
-	  // Calculer la position de la caméra avec un offset fixe (toujours dans la même direction)
-	  const cameraTargetX = targetPosition.x
-	  const cameraTargetZ = targetPosition.z + distance // Camera toujours au sud du bateau
-	  
-	  // Interpolation douce de la position de la caméra
-	  cameraRef.current.position.lerp(
-		new THREE.Vector3(cameraTargetX, targetPosition.y + height, cameraTargetZ),
-		0.1
-	  )
-	  
-	  // La caméra regarde toujours vers le bateau
-	  cameraRef.current.lookAt.lerp(targetPosition, 0.1)
-	  
-	  // Appliquer les positions à la caméra
-	  camera.position.copy(cameraRef.current.position)
-	  camera.lookAt(cameraRef.current.lookAt)
-	})
-  
-	return null
-  }
+function CameraController({ target }: any) {
+  const { camera } = useThree()
+  const cameraRef = useRef({
+    position: new THREE.Vector3(),
+    lookAt: new THREE.Vector3(),
+  })
+
+  useFrame(() => {
+    if (!target.current) return
+
+    // Position cible de la caméra (toujours derrière le bateau)
+    const targetPosition = new THREE.Vector3()
+    target.current.getWorldPosition(targetPosition)
+
+    // Distance fixe derrière le bateau, sans tenir compte de sa rotation
+    const distance = 15 // Distance derrière le bateau
+    const height = 15 // Hauteur au-dessus du bateau
+
+    // Calculer la position de la caméra avec un offset fixe (toujours dans la même direction)
+    const cameraTargetX = targetPosition.x
+    const cameraTargetZ = targetPosition.z + distance // Camera toujours au sud du bateau
+
+    // Interpolation douce de la position de la caméra
+    cameraRef.current.position.lerp(
+      new THREE.Vector3(
+        cameraTargetX,
+        targetPosition.y + height,
+        cameraTargetZ
+      ),
+      0.1
+    )
+
+    // La caméra regarde toujours vers le bateau
+    cameraRef.current.lookAt.lerp(targetPosition, 0.1)
+
+    // Appliquer les positions à la caméra
+    camera.position.copy(cameraRef.current.position)
+    camera.lookAt(cameraRef.current.lookAt)
+  })
+
+  return null
+}
 
 export default function Game() {
   const playerRef = useRef<THREE.Mesh>(null)
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <div style={{ width: "100%", height: "100vh" }}>
       <Canvas>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
-        
+
         {/* On retire OrbitControls puisqu'on gère nous-mêmes la caméra */}
         <OrbitControls />
-        
-        <Ocean />
-        <PlayerBoat ref={playerRef} position={[0, -1, 0]} />
-        {/* <CameraController target={playerRef} /> */}
+        <Physics debug>
+          <RigidBody colliders="trimesh">
+            <Island />
+          </RigidBody>
+          <RigidBody type="fixed">
+            <Ocean />
+          </RigidBody>
+            <PlayerBoat ref={playerRef} position={[0, -1, 0]} />
+        </Physics>
+        <CameraController target={playerRef} />
       </Canvas>
     </div>
   )
