@@ -24,6 +24,7 @@ export default function Game() {
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
         {/* <OrbitControls/> */}
+		<color args={ [ '#f7efd7' ] } attach="background" />
         <Physics debug={false}>
           <Island />
           <Ocean />

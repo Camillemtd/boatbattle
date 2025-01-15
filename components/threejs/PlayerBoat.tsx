@@ -77,8 +77,8 @@ export default function Player() {
     const bodyPosition = body.current.translation()
     const cameraPosition = new THREE.Vector3()
     cameraPosition.copy(bodyPosition)
-    cameraPosition.z += -10
-    cameraPosition.y += 15
+    cameraPosition.z += -15
+    cameraPosition.y += 20
 
     const cameraTarget = new THREE.Vector3()
     cameraTarget.copy(bodyPosition)

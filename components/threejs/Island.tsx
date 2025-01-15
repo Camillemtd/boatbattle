@@ -6,7 +6,7 @@ export default function Island() {
 
   return (
     <RigidBody type="fixed" colliders="trimesh" restitution={0.2} friction={0} mass={1000}>
-      <primitive object={scene} position={[40, -1.1, 0]} scale={1} castShadow receiveShadow/>
+      <primitive object={scene} position={[20, -1.1, 0]} scale={1} castShadow receiveShadow/>
     </RigidBody>
   )
 }
