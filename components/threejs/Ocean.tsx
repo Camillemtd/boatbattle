@@ -1,4 +1,38 @@
 import { RigidBody, CuboidCollider } from "@react-three/rapier"
+import * as THREE from "three"
+
+const boxGeometry = new THREE.BoxGeometry(100, 10, 1)
+
+const wallMaterial = new THREE.MeshStandardMaterial({ color: "slategrey" })
+
+function Walls() {
+  return (
+    <RigidBody type="fixed" restitution={1} friction={0}>
+      <mesh
+        geometry={boxGeometry}
+        material={wallMaterial}
+        position={[0, 0, -50]}
+      />
+      <mesh
+        geometry={boxGeometry}
+        material={wallMaterial}
+        position={[0, 0, 50]}
+      />
+      <mesh
+        geometry={boxGeometry}
+        material={wallMaterial}
+        position={[50, 0, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+      />
+      <mesh
+        geometry={boxGeometry}
+        material={wallMaterial}
+        position={[-50, 0, 0]}
+        rotation={[0, Math.PI / 2, 0]}
+      />
+    </RigidBody>
+  )
+}
 
 export default function Ocean() {
   return (
@@ -13,11 +47,10 @@ export default function Ocean() {
       </mesh>
 
       <RigidBody type="fixed" colliders={false} friction={1}>
-        <CuboidCollider
-          position={[0, -2.2, 0]}
-          args={[50, 0.1, 50]}
-        />
+        <CuboidCollider position={[0, -2.2, 0]} args={[50, 0.1, 50]} />
       </RigidBody>
+
+      <Walls />
     </group>
   )
 }
