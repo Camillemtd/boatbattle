@@ -1,109 +1,87 @@
-import { useRef, forwardRef, useEffect, ForwardedRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import { useGLTF, Clone } from '@react-three/drei'
-import * as THREE from 'three'
-import { useKeyboard } from '../../hooks/useKeyboard'
-import { Mesh, BufferGeometry, Material, } from 'three'
+import { useRef, forwardRef, useEffect, ForwardedRef } from "react"
+import { useFrame } from "@react-three/fiber"
+import { useGLTF, Clone, useKeyboardControls } from "@react-three/drei"
+import * as THREE from "three"
+import { useKeyboard } from "../../hooks/useKeyboard"
+import { RigidBody} from "@react-three/rapier"
+import { Mesh, BufferGeometry, Material } from "three"
 
 type MeshType = Mesh<BufferGeometry, Material | Material[]>
 
-useGLTF.preload('/model/ship-pirate-large.glb')
+useGLTF.preload("/model/ship-pirate-large.glb")
 
-const PlayerBoat = forwardRef((
-  props: any,
-  ref: ForwardedRef<MeshType>
-) => {
-  const localRef = useRef<MeshType>(null)
-  const velocityRef = useRef(new THREE.Vector3())
-  const rotationVelocityRef = useRef(0)
-
-  const { scene } = useGLTF('/model/ship-pirate-large.glb')
+const PlayerBoat = forwardRef((props: any, ref: ForwardedRef<MeshType>) => {
+  const { scene } = useGLTF("/model/ship-pirate-large.glb")
+  const [subscribKeys, getKeys] = useKeyboardControls()
   
-  // Variables de contrôle du bateau
-  const SPEED = 0.01
-  const ROTATION_SPEED = 0.002
-  const WAVE_HEIGHT = 0.2
-  const TILT_FACTOR = 0.2
-  const BUOYANCY = 0.15 // Augmenté pour une force de flottaison plus forte
-  const IMMERSION_DEPTH = 0.9 // Augmenté pour une immersion plus profonde
-  const BASE_HEIGHT = -1 // Hauteur de base de l'océan
+  const body = useRef<any>(null)
+  const rotationSpeed = 2
+  const moveSpeed = 50
+  
+  
+  useFrame((state, delta) => {
+    const { forward, backward, leftward, rightward } = getKeys()
+    
+    if (!body.current) return
 
-  const { forward, backward, left, right } = useKeyboard()
+    // Obtenir la transformation actuelle
+    const quaternion = body.current.rotation()
+    const rotation = new THREE.Euler().setFromQuaternion(
+      new THREE.Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
+    )
 
-  useFrame((state) => {
-    if (!localRef.current) return
+    // Créer un vecteur de direction basé sur la rotation
+    const direction = new THREE.Vector3(0, 0, 1)
+    direction.applyEuler(rotation)
+    
+    // Rotation
+    if (leftward) {
+      body.current.setAngvel({ x: 0, y: rotationSpeed, z: 0 })
+    } else if (rightward) {
+      body.current.setAngvel({ x: 0, y: -rotationSpeed, z: 0 })
+    } else {
+      body.current.setAngvel({ x: 0, y: 0, z: 0 })
+    }
 
-    const mesh = localRef.current
-    const velocity = velocityRef.current
-
-    // Mouvement avant/arrière
+    // Mouvement avant/arrière en utilisant le vecteur de direction
     if (forward) {
-      velocity.z += Math.cos(mesh.rotation.y) * SPEED
-      velocity.x += Math.sin(mesh.rotation.y) * SPEED
+      body.current.applyImpulse({
+        x: direction.x * moveSpeed,
+        y: 0,
+        z: direction.z * moveSpeed
+      }, true)
     }
     if (backward) {
-      velocity.z -= Math.cos(mesh.rotation.y) * SPEED
-      velocity.x -= Math.sin(mesh.rotation.y) * SPEED
+      body.current.applyImpulse({
+        x: -direction.x * moveSpeed,
+        y: 0,
+        z: -direction.z * moveSpeed
+      }, true)
     }
-
-    // Rotation
-    if (left) rotationVelocityRef.current += ROTATION_SPEED
-    if (right) rotationVelocityRef.current -= ROTATION_SPEED
-
-    mesh.rotation.y += rotationVelocityRef.current
-    rotationVelocityRef.current *= 0.95
-
-    // Calcul précis de la hauteur des vagues
-    const time = state.clock.getElapsedTime()
-    const waveX = Math.sin(mesh.position.x * 0.5 + time) * WAVE_HEIGHT
-    const waveZ = Math.cos(mesh.position.z * 0.5 + time) * WAVE_HEIGHT
-    const waveHeight = waveX + waveZ + BASE_HEIGHT
-
-    // Force la position Y à suivre les vagues avec l'immersion
-    const targetY = waveHeight - IMMERSION_DEPTH
-
-    // Application directe de la position Y avec un peu de lissage
-    mesh.position.y += (targetY - mesh.position.y) * BUOYANCY
-
-    // Calcul des angles de vagues pour l'inclinaison
-    const waveGradientX = Math.cos(mesh.position.x * 0.5 + time) * WAVE_HEIGHT * 0.5
-    const waveGradientZ = -Math.sin(mesh.position.z * 0.5 + time) * WAVE_HEIGHT * 0.5
-
-    // Application des rotations
-    mesh.rotation.x = waveGradientZ * TILT_FACTOR - velocity.z * TILT_FACTOR
-    mesh.rotation.z = -waveGradientX * TILT_FACTOR + velocity.x * TILT_FACTOR
-
-    // Mouvement horizontal
-    mesh.position.x += velocity.x
-    mesh.position.z += velocity.z
-
-    // Amortissement de la vélocité horizontale uniquement
-    velocity.x *= 0.95
-    velocity.z *= 0.95
   })
 
-  // Synchroniser la ref locale avec la ref transmise
-  useEffect(() => {
-    if (ref) {
-      if (typeof ref === 'function') {
-        ref(localRef.current)
-      } else {
-        ref.current = localRef.current
-      }
-    }
-  }, [ref])
-
   return (
-    <group ref={localRef} {...props}>
-      <Clone 
-        object={scene}
-        scale={[0.5, 0.5, 0.5]}
-        position={[0,0,0]}
-      />
-    </group>
+    <RigidBody
+      colliders="cuboid"
+      type="dynamic"
+      ref={body}
+      restitution={0.2}
+      friction={1}
+      linearDamping={0.95}
+      angularDamping={0.9}
+      enabledRotations={[false, true, false]}
+    >
+      <group {...props}>
+        <primitive
+          object={scene}
+          scale={[0.5, 0.5, 0.5]}
+          position={[0, 0, 0]}
+        />
+      </group>
+    </RigidBody>
   )
 })
 
-PlayerBoat.displayName = 'PlayerBoat'
+PlayerBoat.displayName = "PlayerBoat"
 
 export default PlayerBoat

@@ -1,13 +1,14 @@
-import { useGLTF } from '@react-three/drei'
+import { useGLTF } from "@react-three/drei"
+import { RigidBody } from "@react-three/rapier"
 
 export default function Island() {
-    const { scene } = useGLTF('./model/island.glb')
-    
-    // Pour une seule instance
-    return (
-        <primitive object={scene} position={[40, 0, 0]} scale={1} />
-    )
-    
+  const { scene } = useGLTF("./model/island.glb")
+
+  return (
+    <RigidBody type="fixed" colliders="trimesh" restitution={0.2} friction={0} mass={1000}>
+      <primitive object={scene} position={[40, -1.1, 0]} scale={1} />
+    </RigidBody>
+  )
 }
 
-useGLTF.preload('./model/island.glb')
+useGLTF.preload("./model/island.glb")
