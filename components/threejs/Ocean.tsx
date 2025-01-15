@@ -12,23 +12,31 @@ function Walls() {
         geometry={boxGeometry}
         material={wallMaterial}
         position={[0, 0, -50]}
+        castShadow
+        receiveShadow
       />
       <mesh
         geometry={boxGeometry}
         material={wallMaterial}
         position={[0, 0, 50]}
+        castShadow
+        receiveShadow
       />
       <mesh
         geometry={boxGeometry}
         material={wallMaterial}
         position={[50, 0, 0]}
         rotation={[0, Math.PI / 2, 0]}
+        castShadow
+        receiveShadow
       />
       <mesh
         geometry={boxGeometry}
         material={wallMaterial}
         position={[-50, 0, 0]}
         rotation={[0, Math.PI / 2, 0]}
+        castShadow
+        receiveShadow
       />
     </RigidBody>
   )
@@ -42,7 +50,8 @@ export default function Ocean() {
         <meshStandardMaterial
           color="#66C7F4"
           transparent={true}
-          opacity={0.8}
+          opacity={0.9}
+          depthWrite={true}
         />
       </mesh>
 

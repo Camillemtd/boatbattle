@@ -1,16 +1,16 @@
 import { useRef, forwardRef, ForwardedRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useGLTF, useKeyboardControls } from "@react-three/drei"
+import { useGLTF, useKeyboardControls, Clone } from "@react-three/drei"
 import * as THREE from "three"
 import { RigidBody } from "@react-three/rapier"
-import { Mesh, BufferGeometry, Material } from "three"
-
-type MeshType = Mesh<BufferGeometry, Material | Material[]>
 
 useGLTF.preload("/model/ship-pirate-large.glb")
+useGLTF.preload("/model/cannon.glb")
 
 export default function Player() {
-  const { scene } = useGLTF("/model/ship-pirate-large.glb")
+  const { scene: shipScene } = useGLTF("/model/ship-pirate-large.glb")
+  const { scene: cannonScene } = useGLTF("/model/cannon.glb")
+
   const [subscribKeys, getKeys] = useKeyboardControls()
   const [smoothCameraPosition] = useState(() => new THREE.Vector3())
   const [smoothTargetPosition] = useState(() => new THREE.Vector3())
@@ -105,10 +105,22 @@ export default function Player() {
     >
       <group>
         <primitive
-          object={scene}
+          object={shipScene}
           scale={[0.5, 0.5, 0.5]}
           position={[0, 0, 0]}
           castShadow
+        />
+        <Clone
+          object={cannonScene}
+          position={[-0.9, 1.02, -0.91]}
+          rotation={[0 , - Math.PI / 2, 0]}
+          scale={0.3}
+        />
+        <Clone
+          object={cannonScene}
+          position={[0.9, 1.02, -0.91]}
+          rotation={[0 , Math.PI / 2, 0]}
+          scale={0.3}
         />
       </group>
     </RigidBody>

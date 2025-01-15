@@ -15,17 +15,16 @@ const Canvas = dynamic(
   }
 )
 
-
 export default function Game() {
   const playerRef = useRef<THREE.Mesh>(null)
 
   return (
     <div style={{ width: "100%", height: "100vh" }}>
-      <Canvas>
+      <Canvas shadows>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
-
-        <Physics debug>
+        {/* <OrbitControls/> */}
+        <Physics debug={false}>
           <Island />
           <Ocean />
           <PlayerBoat />
