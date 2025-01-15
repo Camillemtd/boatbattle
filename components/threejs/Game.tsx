@@ -25,11 +25,10 @@ export default function Game() {
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
 
-        <OrbitControls />
         <Physics debug>
           <Island />
           <Ocean />
-          <PlayerBoat position={[0, -1, 0]} />
+          <PlayerBoat />
         </Physics>
       </Canvas>
     </div>
