@@ -16,7 +16,7 @@ export default function Cannon({ position, rotation, shipBody, side }: Cannon) {
   const cannonBallRef = useRef<any>(null)
   const [canFire, setCanFire] = useState(true)
 
-  const CANNON_FORCE = 2
+  const CANNON_FORCE = 1.5
 
   const fireCannon = () => {
     if (!shipBody.current) return
@@ -37,8 +37,11 @@ export default function Cannon({ position, rotation, shipBody, side }: Cannon) {
       .add(shipPosition)
 
 
-const cannonDirection = new THREE.Vector3(side === "right" ? 1: -1, 0.5, 0) 
-.applyEuler(shipRotation) 
+const cannonDirection = new THREE.Vector3(
+  side === "right" ? 1 : -1,          
+  side === "right" ? -0.1 : 0.1,      
+  0
+).applyEuler(shipRotation)
     
     const cannonBall = {
       position: cannonWorldPosition,

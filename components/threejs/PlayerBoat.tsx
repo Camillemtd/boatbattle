@@ -25,7 +25,6 @@ export default function Player() {
 
     if (!body.current) return
 
-    // Obtenir la transformation actuelle
     const quaternion = body.current.rotation()
     const rotation = new THREE.Euler().setFromQuaternion(
       new THREE.Quaternion(
@@ -36,11 +35,9 @@ export default function Player() {
       )
     )
 
-    // Créer un vecteur de direction basé sur la rotation
     const direction = new THREE.Vector3(0, 0, 1)
     direction.applyEuler(rotation)
 
-    // Rotation
     if (leftward) {
       body.current.setAngvel({ x: 0, y: rotationSpeed, z: 0 })
     } else if (rightward) {
@@ -49,7 +46,6 @@ export default function Player() {
       body.current.setAngvel({ x: 0, y: 0, z: 0 })
     }
 
-    // Mouvement avant/arrière en utilisant le vecteur de direction
     if (forward) {
       body.current.applyImpulse(
         {
@@ -114,7 +110,7 @@ export default function Player() {
           />
           <Clone
             object={cannonScene}
-            position={[-0.9, 1.02, -0.91]}
+            position={[-0.9, 1.1, -0.91]}
             scale={0.3}
             rotation={[0, -Math.PI / 2, 0]}
           />
@@ -127,13 +123,13 @@ export default function Player() {
         </group>
       </RigidBody>
       <Cannon
-        position={new THREE.Vector3(-0.9, 1.02, -0.91)}
+        position={new THREE.Vector3(-1.2, 1.5, -0.91)}
         rotation={new THREE.Euler(0, -Math.PI / 2, 0)}
         shipBody={body}
         side="right"
       />
       <Cannon
-        position={new THREE.Vector3(0.9, 1.02, -0.91)}
+        position={new THREE.Vector3(1.3, 1.5, -0.91)}
         rotation={new THREE.Euler(0, Math.PI / 2, 0)}
         shipBody={body}
         side='left'
