@@ -12,6 +12,8 @@ export default function Home() {
           { name: "backward", keys: ["ArrowDown", "KeyS"] },
           { name: "leftward", keys: ["ArrowLeft", "KeyA"] },
           { name: "rightward", keys: ["ArrowRight", "KeyD"] },
+          {name: "rightcannon", keys: ["KeyP"]}, 
+          {name: "leftcannon", keys: ["KeyO"]}, 
           { name: "jump", keys: ["Space"] },
         ]}
       >

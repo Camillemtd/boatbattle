@@ -1,8 +1,9 @@
-import { useRef, forwardRef, ForwardedRef, useState } from "react"
+import { useRef, useState } from "react"
 import { useFrame } from "@react-three/fiber"
-import { useGLTF, useKeyboardControls, Clone } from "@react-three/drei"
+import { Clone, useGLTF, useKeyboardControls } from "@react-three/drei"
 import * as THREE from "three"
 import { RigidBody } from "@react-three/rapier"
+import Cannon from "./Cannon"
 
 useGLTF.preload("/model/ship-pirate-large.glb")
 useGLTF.preload("/model/cannon.glb")
@@ -92,37 +93,51 @@ export default function Player() {
   })
 
   return (
-    <RigidBody
-      colliders="cuboid"
-      type="dynamic"
-      ref={body}
-      canSleep={false}
-      restitution={0.2}
-      friction={1}
-      linearDamping={0.95}
-      angularDamping={0.9}
-      enabledRotations={[false, true, false]}
-    >
-      <group>
-        <primitive
-          object={shipScene}
-          scale={[0.5, 0.5, 0.5]}
-          position={[0, 0, 0]}
-          castShadow
-        />
-        <Clone
-          object={cannonScene}
-          position={[-0.9, 1.02, -0.91]}
-          rotation={[0 , - Math.PI / 2, 0]}
-          scale={0.3}
-        />
-        <Clone
-          object={cannonScene}
-          position={[0.9, 1.02, -0.91]}
-          rotation={[0 , Math.PI / 2, 0]}
-          scale={0.3}
-        />
-      </group>
-    </RigidBody>
+    <>
+      <RigidBody
+        colliders="cuboid"
+        type="dynamic"
+        ref={body}
+        canSleep={false}
+        restitution={0.2}
+        friction={1}
+        linearDamping={0.95}
+        angularDamping={0.9}
+        enabledRotations={[false, true, false]}
+      >
+        <group>
+          <primitive
+            object={shipScene}
+            scale={[0.5, 0.5, 0.5]}
+            position={[0, 0, 0]}
+            castShadow
+          />
+          <Clone
+            object={cannonScene}
+            position={[-0.9, 1.02, -0.91]}
+            scale={0.3}
+            rotation={[0, -Math.PI / 2, 0]}
+          />
+          <Clone
+            object={cannonScene}
+            position={[0.9, 1.02, -0.91]}
+            scale={0.3}
+            rotation={[0, Math.PI / 2, 0]}
+          />
+        </group>
+      </RigidBody>
+      <Cannon
+        position={new THREE.Vector3(-0.9, 1.02, -0.91)}
+        rotation={new THREE.Euler(0, -Math.PI / 2, 0)}
+        shipBody={body}
+        side="right"
+      />
+      <Cannon
+        position={new THREE.Vector3(0.9, 1.02, -0.91)}
+        rotation={new THREE.Euler(0, Math.PI / 2, 0)}
+        shipBody={body}
+        side='left'
+      />
+    </>
   )
 }
